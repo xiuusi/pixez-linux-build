@@ -2,7 +2,7 @@
 
 这是 [PixEz-Flutter](https://github.com/Pixeval/PixEz) 的 Linux 平台构建支持文件。
 
-> **注意：本文件由 AI（OpenCode）生成和维护。** 
+> **注意：本文件由 AI（哈基米网页免费版&Claude网页免费版）生成和维护。** 
 
 ---
 
