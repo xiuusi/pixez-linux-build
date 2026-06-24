@@ -33,6 +33,7 @@ add_executable(${BINARY_NAME}
   "runner/single_instance_plugin.cc"
   "runner/document_plugin.cc"
   "runner/clipboard_plugin.cc"
+  "runner/weiss_plugin.cc"
   "${FLUTTER_MANAGED_DIR}/generated_plugin_registrant.cc"
 )
 

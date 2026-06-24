@@ -1,8 +1,18 @@
 # PixEz Flutter Linux 客户端构建方案
 
-这是 [PixEz-Flutter](https://github.com/Pixeval/PixEz) 的 Linux 平台构建支持文件。
+这是 [PixEz-Flutter](https://github.com/Notsfsssf/pixez-flutter) 的 Linux 平台构建支持文件。
 
-> **注意：本文件由 AI（哈基米网页免费版&Claude网页免费版）生成和维护。** 
+> **注意：本文件由 AI（~~哈基米网页免费版&Claude网页免费版~~由glm5.2接手）生成和维护。** 
+
+---
+
+## ⚠️ 注意事项
+
+本构建仅补齐 Linux 桌面端的 **原生能力**（窗口、保存、单例、剪贴板等 channel），并不改写主仓库 `lib/` 下的 Dart 业务代码，因此以下限制源自上游，本项目无法绕过：
+
+- **触屏操作逻辑**：界面交互仍沿用上游的移动端手势（长按、滑动、缩放等），未针对键鼠做适配。桌面端的滑动、滚轮懒加载等部分行为已通过上游既有的 `Platform.isLinux` 判断生效，但整体体验并非桌面原生。
+- **复制图片功能**：原生 channel 已实现 GTK 剪贴板写入，且 `lib/clipboard_plugin.dart` 已放开 Linux 开关；但受上游 Dart 侧调用链限制，部分场景下复制可能失效，属于已知缺陷。
+- **AI风险**：本项目为AI维护，可能存在大量未发现问题，请谨慎使用。
 
 ---
 
@@ -73,8 +83,8 @@ flutter build linux --release
 
 ## 相关链接
 
-- [PixEz-Flutter 主仓库](https://github.com/Pixeval/PixEz)
-- [PixEz 官方下载](https://github.com/Pixeval/PixEz/releases)
+- [PixEz-Flutter 主仓库](https://github.com/Notsfsssf/pixez-flutter)
+- [PixEz 官方下载](https://github.com/Notsfsssf/pixez-flutter/releases)
 
 ---
 

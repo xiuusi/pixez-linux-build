@@ -7,11 +7,13 @@
 
 #include "flutter/generated_plugin_registrant.h"
 
+#include "single_instance_plugin.h"
 
 void register_paths_plugin(FlPluginRegistrar* registrar);
 void register_single_instance_plugin(FlPluginRegistrar* registrar);
 void register_document_plugin(FlPluginRegistrar* registrar);
 void register_clipboard_plugin(FlPluginRegistrar* registrar);
+void register_weiss_plugin(FlPluginRegistrar* registrar);
 
 struct _MyApplication {
   GtkApplication parent_instance;
@@ -102,6 +104,11 @@ static void my_application_activate(GApplication* application) {
     FL_PLUGIN_REGISTRY(self->view), "ClipboardPlugin");
   register_clipboard_plugin(clipboard_registrar);
 
+  FlPluginRegistrar* weiss_registrar =
+  fl_plugin_registry_get_registrar_for_plugin(
+    FL_PLUGIN_REGISTRY(self->view), "WeissPlugin");
+  register_weiss_plugin(weiss_registrar);
+
   gtk_widget_grab_focus(GTK_WIDGET(self->view));
 
   // Connect delete-event to properly handle window close and prevent crashes
@@ -113,6 +120,14 @@ static gboolean my_application_local_command_line(GApplication* application,
                                                   int* exit_status) {
   MyApplication* self = MY_APPLICATION(application);
   self->dart_entrypoint_arguments = g_strdupv(*arguments + 1);
+
+  // 单实例检测：如已有实例在运行，转发命令行参数后立即退出本进程。
+  // 抽象 Unix 套接字在内核自动管理生命周期，干净无残留。
+  gint argc = g_strv_length(*arguments);
+  if (single_instance_try_lock_or_forward(argc, *arguments) == 1) {
+    *exit_status = 0;
+    return TRUE;
+  }
 
   g_autoptr(GError) error = nullptr;
   if (!g_application_register(application, nullptr, &error)) {
