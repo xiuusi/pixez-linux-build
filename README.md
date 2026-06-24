@@ -11,7 +11,7 @@
 本构建仅补齐 Linux 桌面端的 **原生能力**（窗口、保存等），并不改写主仓库 `lib/` 下的 Dart 业务代码，因此以下限制源自上游，本项目无法绕过：
 
 - **触屏操作逻辑**：界面交互仍沿用上游的移动端手势（长按、滑动、缩放等），未针对键鼠做适配。
-- **复制图片功能**：原生 channel 已实现 GTK 剪贴板写入，但受上游 Dart 侧调用链限制，部分场景下复制可能失效，属于已知缺陷。
+- **复制图片功能不可用**：原生 channel 已实现 GTK 剪贴板写入，但上游 `lib/clipboard_plugin.dart` 中 `supported = Platform.isWindows` 仅认 Windows，本项目只覆盖 `linux/` 目录、不改 `lib/`，因此 Linux 构建后该功能在 UI 层被禁用。如需启用，请自行在主仓库把该行改为 `Platform.isWindows || Platform.isLinux`。
 - **AI风险**：本项目为AI维护，可能存在大量未发现问题，请谨慎使用。
 
 ---
