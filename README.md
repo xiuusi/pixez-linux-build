@@ -1,90 +1,76 @@
-# PixEz Flutter Linux 客户端构建方案
+# PixEz Linux Build
 
-这是 [PixEz-Flutter](https://github.com/Notsfsssf/pixez-flutter) 的 Linux 平台构建支持文件。
+[PixEz-Flutter](https://github.com/Notsfsssf/pixez-flutter) 的 Linux 平台原生支持层。
 
-> **注意：本文件由 AI（~~哈基米网页免费版&Claude网页免费版~~由glm5.2接手）生成和维护。** 
+本仓库提供 PixEz 在 Linux 桌面端所需的原生能力——窗口管理、文件保存、剪贴板、单实例、GIF 编码等。覆盖 `linux/` 目录，**不修改主线 Dart 业务代码**。
 
----
+## 插件清单
 
-## ⚠️ 注意事项
+| 插件 | 通道 | 功能 |
+|------|------|------|
+| `DocumentPlugin` | `com.perol.dev/save` | 文件保存、另存为对话框、路径读写、权限查询 |
+| `ClipboardPlugin` | `com.perol.dev/clipboard` | 剪贴板读写（GTK 实现） |
+| `SafPlugin` | `com.perol.dev/saf` | SAF 兼容层，目录选择与文件写入 |
+| `WeissPlugin` | `com.perol.dev/weiss` | 辅助功能插件 |
+| `PathsPlugin` | `com.perol.dev/paths` | 系统路径查询 |
+| `SingleInstancePlugin` | `com.perol.dev/single_instance` | 单实例检测（Unix socket） |
+| `EncodePlugin` | `samples.flutter.dev/battery` | **Ugoira 动图 GIF 编码**（giflib + GdkPixbuf） |
 
-本构建仅补齐 Linux 桌面端的 **原生能力**（窗口、保存等），并不改写主仓库 `lib/` 下的 Dart 业务代码，因此以下限制源自上游，本项目无法绕过：
-
-- **触屏操作逻辑**：界面交互仍沿用上游的移动端手势（长按、滑动、缩放等），未针对键鼠做适配。
-- **复制图片功能**：上游 `lib/clipboard_plugin.dart` 仅认 `Platform.isWindows`，本项目只覆盖 `linux/` 目录、不改 `lib/`。原生 channel 已实现 GTK 剪贴板写入，但本构建实测点击复制后剪贴板并未出现内容，未经测试不可靠，按已知缺陷处置。
-- **AI风险**：本项目为AI维护，可能存在大量未发现问题，请谨慎使用。
-
----
-
-## 构建方法
-
-### 前置要求
-
-确保已安装以下系统依赖：
+## 前置依赖
 
 ```bash
-# Debian/Ubuntu
-sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+# Arch Linux
+sudo pacman -S --needed clang cmake ninja pkgconf gtk3 giflib
+
+# Debian / Ubuntu
+sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libgif-dev
 
 # Fedora
-sudo dnf install -y clang cmake ninja-build pkg-config gtk3-devel xz-devel
-
-# Arch Linux
-sudo pacman -S --needed clang cmake ninja pkgconf gtk3
+sudo dnf install -y clang cmake ninja-build pkg-config gtk3-devel giflib-devel
 ```
 
-### Flutter 环境
+此外需要 [Flutter SDK](https://flutter.dev/docs/get-started/install/linux) 3.0 或更高版本。
 
-- [Flutter SDK](https://flutter.dev/docs/get-started/install/linux) 3.0 或更高版本
-- 验证环境：
-  ```bash
-  flutter doctor
-  ```
-
-### 构建步骤
-
-1. **下载仓库中的 `linux` 文件夹，复制到你 git 的 pixez-flutter 目录**
-
-2. **获取依赖并构建**
+## 构建步骤
 
 ```bash
-flutter pub get
+# 1. 克隆主线
+git clone https://github.com/Notsfsssf/pixez-flutter.git
+cd pixez-flutter
 
-cd plugins/rhttp
+# 2. 获取 linux-build 的 linux/ 目录
+git clone https://github.com/Here-is-Daiyu/pixez-linux-build.git
+cp -a pixez-linux-build/linux .
+
+# 3. 获取 Dart 依赖
 flutter pub get
+cd plugins/rhttp && flutter pub get && cd ../..
 dart run build_runner build --delete-conflicting-outputs
-cd ../..
-
-dart run build_runner build --delete-conflicting-outputs
-
 flutter pub get
-flutter run -d linux
-```
 
-### 构建发布版
-
-```bash
+# 4. 构建
 flutter build linux --release
 ```
 
-构建输出位于 `build/linux/x64/release/bundle/` 目录。
+构建产物位于 `build/linux/x64/release/bundle/`。
 
----
+## 已知限制
 
-## 下载图片保存位置
+- **触屏交互**：仍沿袭上游的移动端手势设计（长按、滑动、缩放等），未针对键鼠做专项适配。
+- **复制图片**：ClipboardPlugin 原生通道已实现 GTK 剪贴板写入，但上游 Dart 层 `lib/clipboard_plugin.dart` 仅在 `Platform.isWindows` 时走插件路径，Linux 端暂不走通，实测复制后剪贴板无内容。
+
+## 保存位置
 
 应用下载的图片默认保存在：
 
 ```
-~/Pictures/pixez/
+~/Pictures/PixEz/
 ```
 
----
+可在设置页面中修改保存路径。
 
 ## 相关链接
 
 - [PixEz-Flutter 主仓库](https://github.com/Notsfsssf/pixez-flutter)
-- [PixEz 官方下载](https://github.com/Notsfsssf/pixez-flutter/releases)
-
----
-
+- [PixEz 官方 Releases](https://github.com/Notsfsssf/pixez-flutter/releases)
+- [Arch Linux 打包 (pixez-flutter-bin)](https://github.com/Here-is-Daiyu/pixez) — 本构建的预编译包
