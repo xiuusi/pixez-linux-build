@@ -8,6 +8,7 @@
 #include "flutter/generated_plugin_registrant.h"
 
 #include "single_instance_plugin.h"
+#include "encode_plugin.h"
 
 void register_paths_plugin(FlPluginRegistrar* registrar);
 void register_single_instance_plugin(FlPluginRegistrar* registrar);
@@ -114,6 +115,11 @@ static void my_application_activate(GApplication* application) {
       fl_plugin_registry_get_registrar_for_plugin(
           FL_PLUGIN_REGISTRY(self->view), "SafPlugin");
   register_saf_plugin(saf_registrar);
+
+  FlPluginRegistrar* encode_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(
+          FL_PLUGIN_REGISTRY(self->view), "EncodePlugin");
+  register_encode_plugin(encode_registrar);
 
   gtk_widget_grab_focus(GTK_WIDGET(self->view));
 

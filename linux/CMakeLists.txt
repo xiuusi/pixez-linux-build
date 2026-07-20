@@ -23,6 +23,13 @@ add_subdirectory(${FLUTTER_MANAGED_DIR})
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
+pkg_check_modules(GDK_PIXBUF REQUIRED IMPORTED_TARGET gdk-pixbuf-2.0)
+
+# giflib 没有 .pc 文件，用 find_library 定位
+find_library(GIF_LIB gif)
+if(NOT GIF_LIB)
+  message(FATAL_ERROR "giflib not found. Install it: sudo pacman -S giflib (or apt install giflib)")
+endif()
 
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
 
@@ -35,6 +42,7 @@ add_executable(${BINARY_NAME}
   "runner/clipboard_plugin.cc"
   "runner/saf_plugin.cc"
   "runner/weiss_plugin.cc"
+  "runner/encode_plugin.cc"
   "${FLUTTER_MANAGED_DIR}/generated_plugin_registrant.cc"
 )
 
@@ -48,6 +56,8 @@ target_include_directories(${BINARY_NAME} PRIVATE
 
 target_link_libraries(${BINARY_NAME} PRIVATE flutter)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
+target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GDK_PIXBUF)
+target_link_libraries(${BINARY_NAME} PRIVATE ${GIF_LIB})
 
 add_dependencies(${BINARY_NAME} flutter_assemble)
 
